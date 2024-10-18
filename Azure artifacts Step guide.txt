@@ -1,11 +1,15 @@
 Azure artifacts 
 
+# Step 1 
+
 -Go to Azure DevOps org.
 -Create new project -Name -AzArtifacts -Create
 -Go to Repo -import a repository -Using git -Paste below URL as it is.
 -https://github.com/Surdas96/Artifacts_code.git
 -Click on import
 -Refresh -You will see all your files. 
+
+# Step 2 
 
 -Go to azure portal 
 -Azure app service
@@ -17,6 +21,8 @@ Azure artifacts
 -Region -Canda
 -Pricing Free trial
 -Review and create 
+
+Step 3 
 
 # To run pipeline you need a agent that can run Linux OS. 
 # Below mentioned agent and pool we created using parallelism.
@@ -47,7 +53,9 @@ stages:
       inputs:
         command: 'custom'
         customCommand: 'run build'
-    
+
+# Step 4 
+
 -Now open Artifacts tab in new window
 -Create feed
 -Name -NikeFeed
@@ -81,6 +89,8 @@ stages:
  
 -If you go back to Artifacts refresh feed you will see package.
 -If you open that package you will see all the details. 
+
+# Step 5 
 
 #Now We want to create release pipeline to consume artifacts.
 
@@ -121,4 +131,3 @@ stages:
 -Open release and check logs or stages. 
 -If you go to Web app service in azure portal and browse link
 it will now access web app. 
-
