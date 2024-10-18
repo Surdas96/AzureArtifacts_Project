@@ -1,0 +1,124 @@
+Azure artifacts 
+
+-Go to Azure DevOps org.
+-Create new project -Name -AzArtifacts -Create
+-Go to Repo -import a repository -Using git -Paste below URL as it is.
+-https://github.com/Surdas96/Artifacts_code.git
+-Click on import
+-Refresh -You will see all your files. 
+
+-Go to azure portal 
+-Azure app service
+-Create web app
+-New resource group -RG01
+-Name -NikeCloneApp
+-Runtime -node 18
+-OS -Linux
+-Region -Canda
+-Pricing Free trial
+-Review and create 
+
+# To run pipeline you need a agent that can run Linux OS. 
+# Below mentioned agent and pool we created using parallelism.
+
+-Go back to azure project
+-Click on azure pipeline and create new pipeline
+-Use azure repo git
+-Select -your repo
+-select starter pipeline
+-Remove all code and paste below code.
+
+trigger: 
+- main
+
+stages:
+- stage: Build
+  jobs:
+  - job: Build
+    pool:
+      vmImage: 'ubuntu-latest'
+      
+    steps:
+    - task: Npm@1
+      inputs:
+        command: 'custom'
+        customCommand: 'install -D tailwindcss postcss autoprefixer'
+    - task: Npm@1
+      inputs:
+        command: 'custom'
+        customCommand: 'run build'
+    
+-Now open Artifacts tab in new window
+-Create feed
+-Name -NikeFeed
+-Create
+-If you see on left side one drop down box from there chose your project name. (Artifacts-SampleFeed)
+-Then on right side open feed setting option.
+-Go to permission -1st option Artifacts project build service -Collaborator -last 3 dot click and delete
+-add user/group
+-Search project collection build service with organisation name
+-Choose feed publisher (Contributor)
+-Also search project name (AzArtifacts) with org. name and contributor.
+
+-Go back to code 
+-Click on show assistance 
+-search npm
+-Command -publish 
+-Working folder - ./dist
+-select registry I select here
+-Target registry -Select from drop down -Artifacts-NikeFeed (you created artifacts feed )
+-Click on add. (curser should be after npm1 task at last )
+-Code will be like below.
+
+- task: Npm@1
+  inputs:
+    command: 'publish'
+    workingDir: './dist'
+    publishRegistry: 'useFeed'
+    publishFeed: 'Your feed Code appear here'
+
+-Save and run.
+ 
+-If you go back to Artifacts refresh feed you will see package.
+-If you open that package you will see all the details. 
+
+#Now We want to create release pipeline to consume artifacts.
+
+-Go to release pipeline
+-Create pipeline -Release
+-Select azure app service deployment
+-Stage name -Deployment stage(Any)
+-Now go to artifacts and select azure artifacts from drop down instead of build
+-Feed -From dropdown (which one you have created )
+-Package type -npm
+-View -Local
+-Package -from drop down select nike and copy that name 
+-again go to view -change to prerelease 
+-Package -Paste name which one you copied
+-Default version -latest
+-Add
+-Now click on thunder sign and enable Continuous deployment
+
+-Go to deployment stage and add job
+-Azure subscription free trial and authorize 
+-App type -Web app on linux
+-App service name -from drop down you have created in azure
+-Click on run on agent -Agent Pool -Azure Pipelines
+-Agent Specification -ubuntu latest
+-Click on Deploy Azure app service 
+-Package folder -select from 3 dot choose azure artifacts
+
+-Open post deployment action
+-Deployment script type -Inline script
+-Paste inline script -cp -rf /home/site/wwwroot/package/* /home/site/wwwroot/
+-Save -Ok
+
+-Go to azure artifacts -Select feed
+-Click on Promote packages
+-Select view -NikeFeed@Prerelease
+-Promote
+-Now if you go to Release pipeline it will start deployment
+-Open release and check logs or stages. 
+-If you go to Web app service in azure portal and browse link
+it will now access web app. 
+
